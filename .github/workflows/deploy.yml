@@ -40,22 +40,32 @@ jobs:
 
           
       - name: Deploy on EC2
+        env:
+          EC2_IP: ${{ steps.provision.outputs.ec2_public_ip }}
+          GH_USER: ${{ secrets.USER_NAME_GITHUB }}
+          REPO: ${{ secrets.REPO_NAME }}
         run: |
-          ssh -o StrictHostKeyChecking=no -i ec2_key.pem ubuntu@${{ steps.provision.outputs.ec2_public_ip }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i ec2_key.pem ubuntu@$EC2_IP << EOF
             set -e
+
             sudo apt-get update -y
-            curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-            sudo apt-get install -y nodejs
+            curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+            sudo apt-get install -y nodejs git
             sudo npm i -g pm2
 
-            git clone https://github.com/${{ secrets.USER_NAME_GITHUB }}/${{secrets.REPO_NAME}}.git
-            cd ${REPO_NAME}
+            if [ -d "$REPO/.git" ]; then
+              cd "$REPO"
+              git fetch --all
+              git reset --hard origin/master
+            else
+              rm -rf "$REPO"
+              git clone "https://github.com/$GH_USER/$REPO.git" "$REPO"
+              cd "$REPO"
+            fi
+
             npm ci || npm install
-
-            pm2 delete ${{secrets.REPO_NAME}} || true
-            pm2 start index.js --name ${{secrets.REPO_NAME}} --update-env
+            pm2 delete "$REPO" || true
+            pm2 start index.js --name "$REPO" --update-env
             pm2 save
-
-            # optional: auto-start on reboot
             pm2 startup systemd -u ubuntu --hp /home/ubuntu | tail -n 1 | sudo bash
           EOF
