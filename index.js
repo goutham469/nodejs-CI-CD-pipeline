@@ -6,5 +6,5 @@ app.use(CORS())
 
 app.get("/", (req,res) => res.send("Hello man !"));
 
-const {PORT} = process.env()
+const {PORT} = process.env;
 app.listen(4000, ()=> console.log("running on PORT ", PORT))
