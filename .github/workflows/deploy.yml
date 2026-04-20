@@ -44,6 +44,7 @@ jobs:
           EC2_IP: ${{ steps.provision.outputs.ec2_public_ip }}
           GH_USER: ${{ secrets.USER_NAME_GITHUB }}
           REPO: ${{ secrets.REPO_NAME }}
+          PORT : ${{ secrets.PORT }}
         run: |
           ssh -o StrictHostKeyChecking=no -i ec2_key.pem ubuntu@$EC2_IP << EOF
             set -e
@@ -57,10 +58,14 @@ jobs:
               cd "$REPO"
               git fetch --all
               git reset --hard origin/master
+              rm .env
+              nano .env
+              echo "PORT=$PORT" >> .env
             else
               rm -rf "$REPO"
               git clone "https://github.com/$GH_USER/$REPO.git" "$REPO"
               cd "$REPO"
+              echo "PORT=$PORT" >> .env
             fi
 
             npm ci || npm install
