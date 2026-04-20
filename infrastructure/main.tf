@@ -73,6 +73,6 @@ resource "aws_instance" "this" {
   key_name = var.key_name
 }
 
-output "public_ip" {
+output "ec2_public_ip" {
   value = aws_instance.this.public_ip
 }
