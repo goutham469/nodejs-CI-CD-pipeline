@@ -79,8 +79,8 @@ jobs:
               dir
 
               npm ci || npm install
-              pm2 delete "\$REPO" || true
-              pm2 start index.js --name "\$REPO" --update-env
+              pm2 delete "$REPO" || true
+              pm2 start index.js --name "$REPO" --update-env
               pm2 save
               pm2 startup systemd -u ubuntu --hp /home/ubuntu | tail -n 1 | sudo bash
             EOF
