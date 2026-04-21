@@ -60,6 +60,7 @@ jobs:
             GH_USER: ${{ secrets.USER_NAME_GITHUB }}
             REPO: ${{ secrets.REPO_NAME }}
             PORT: ${{ secrets.PORT }}
+            DOMAIN: ${{ secrets.DOMAIN }}
         run: |
             ssh -o StrictHostKeyChecking=no -i ec2_key.pem ubuntu@"$EC2_IP" << EOF
               set -e
@@ -70,8 +71,6 @@ jobs:
               sudo npm i -g pm2
 
               cd /home/ubuntu
-
-              dir
 
               if [ -d "$REPO/.git" ]; then
                 cd "$REPO"
@@ -85,17 +84,37 @@ jobs:
                 git reset --hard origin/master
               fi
 
+              # listing out files and directories for debugging purpose
               dir
 
               # write env fresh (no interactive editor)
               printf "PORT=%s\n" "$PORT" > .env
-
-              # list all files to verify .env is created and .git is not deleted
-              dir
 
               npm ci || npm install
               pm2 delete "$REPO" || true
               pm2 start index.js --name "$REPO" --update-env
               pm2 save
               pm2 startup systemd -u ubuntu --hp /home/ubuntu | tail -n 1 | sudo bash
+
+              # install nginx and configure it as reverse proxy
+              sudo apt-get install -y nginx
+              sudo rm -f /etc/nginx/sites-enabled/default
+              sudo nano /etc/nginx/sites-available/"$DOMAIN" << 'NGINXCONFIG'
+              server {
+                  listen 80;
+                  server_name "$DOMAIN";
+
+                  location / {
+                      proxy_pass http://localhost:$PORT;
+                      proxy_http_version 1.1;
+                      proxy_set_header Upgrade $http_upgrade;
+                      proxy_set_header Connection 'upgrade';
+                      proxy_set_header Host $host;
+                      proxy_cache_bypass $http_upgrade;
+                  }
+              }
+              NGINXCONFIG
+              sudo ln -s /etc/nginx/sites-available/"$DOMAIN" /etc/nginx/sites-enabled/
+              sudo nginx -t
+              sudo systemctl restart nginx
             EOF
