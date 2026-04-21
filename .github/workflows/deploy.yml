@@ -54,6 +54,8 @@ jobs:
               sudo apt-get install -y nodejs git
               sudo npm i -g pm2
 
+              dir
+
               if [ -d "\$REPO/.git" ]; then
                 cd "\$REPO"
                 git fetch --all
