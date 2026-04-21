@@ -9,20 +9,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        id: checkout
+      
       - name: setup nodejs for testing
         uses: actions/setup-node@v3
+        id: setup-node-for-testing
         with:
           node-version: "20"
       
       - name: Install dependencies
         run: npm install
+        id: install-dependencies-for-testing
 
       - name: Run tests
         run: npm test
+        id: run-tests
 
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
       - name: setup aws cli
         uses: aws-actions/configure-aws-credentials@v4
         with:
