@@ -9,6 +9,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: setup nodejs for testing
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+      
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
+
       - name: Checkout code
         uses: actions/checkout@v4
       
