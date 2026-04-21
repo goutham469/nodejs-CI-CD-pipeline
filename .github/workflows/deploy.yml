@@ -106,21 +106,22 @@ jobs:
                 sudo rm -f /etc/nginx/sites-enabled/"$DOMAIN"
               fi
 
-              sudo tee /etc/nginx/sites-available/$DOMAIN>/dev/null <<NGINXCONFIG
-              server {
+              sudo tee /etc/nginx/sites-available/$DOMAIN > /dev/null <<EOF
+              $(printf "server {
                   listen 80;
-                  server_name $DOMAIN;
+                  server_name %s;
 
                   location / {
-                      proxy_pass http://localhost:$PORT;
+                      proxy_pass http://localhost:%s;
                       proxy_http_version 1.1;
-                      proxy_set_header Upgrade $http_upgrade;
+                      proxy_set_header Upgrade \$http_upgrade;
                       proxy_set_header Connection 'upgrade';
-                      proxy_set_header Host $host;
-                      proxy_cache_bypass $http_upgrade;
+                      proxy_set_header Host \$host;
+                      proxy_cache_bypass \$http_upgrade;
                   }
               }
-              NGINXCONFIG
+              " "$DOMAIN" "$PORT")
+              EOF
 
               # create symbolic link for nginx configuration and restart nginx
               sudo ln -s /etc/nginx/sites-available/"$DOMAIN" /etc/nginx/sites-enabled/
