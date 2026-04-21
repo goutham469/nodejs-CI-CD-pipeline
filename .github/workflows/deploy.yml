@@ -55,18 +55,24 @@ jobs:
             sudo npm i -g pm2
 
             if [ -d "$REPO/.git" ]; then
+              dir
               cd "$REPO"
+              dir
               git fetch --all
               git reset --hard origin/master
+              dir
               rm .env
               nano .env
               echo "PORT=$PORT" >> .env
             else
               rm -rf "$REPO"
               git clone "https://github.com/$GH_USER/$REPO.git" "$REPO"
+              dir
               cd "$REPO"
+              dir
               git fetch --all
               git reset --hard origin/master
+              dir
               echo "PORT=$PORT" >> .env
             fi
 
