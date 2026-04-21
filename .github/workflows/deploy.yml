@@ -106,7 +106,7 @@ jobs:
                 sudo rm -f /etc/nginx/sites-enabled/"$DOMAIN"
               fi
 
-              sudo nano /etc/nginx/sites-available/$DOMAIN <<NGINXCONFIG
+              sudo tee /etc/nginx/sites-available/$DOMAIN>/dev/null <<NGINXCONFIG
               server {
                   listen 80;
                   server_name $DOMAIN;
