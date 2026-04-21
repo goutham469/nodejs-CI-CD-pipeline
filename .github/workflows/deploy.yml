@@ -99,10 +99,10 @@ jobs:
               # install nginx and configure it as reverse proxy
               sudo apt-get install -y nginx
               sudo rm -f /etc/nginx/sites-enabled/default
-              sudo nano /etc/nginx/sites-available/"$DOMAIN" << 'NGINXCONFIG'
+              sudo tee /etc/nginx/sites-available/$DOMAIN << 'NGINXCONFIG'
               server {
                   listen 80;
-                  server_name "$DOMAIN";
+                  server_name $DOMAIN;
 
                   location / {
                       proxy_pass http://localhost:$PORT;
