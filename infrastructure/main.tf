@@ -41,9 +41,11 @@ resource "aws_security_group" "this" {
     to_port = 22
     protocol = "tcp"
     cidr_blocks = [ "0.0.0.0/0" ]
+    description = "ssh server"
   }
 
   ingress {
+    description = "http server"
     from_port = 80
     to_port = 80
     protocol = "tcp"
@@ -52,7 +54,7 @@ resource "aws_security_group" "this" {
 
   ingress {
     description = "node.js server CI/CD pipeline"
-    from_port =4000
+    from_port = 4000
     to_port = 4000
     protocol = "tcp"
   }
