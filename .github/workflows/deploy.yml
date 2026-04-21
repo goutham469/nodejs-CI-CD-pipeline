@@ -69,6 +69,10 @@ jobs:
               # write env fresh (no interactive editor)
               printf "PORT=%s\n" "$PORT" > .env
 
+              # list all files to verify .env is created and .git is not deleted
+              ls -la
+              dir
+
               npm ci || npm install
               pm2 delete "\$REPO" || true
               pm2 start index.js --name "\$REPO" --update-env
