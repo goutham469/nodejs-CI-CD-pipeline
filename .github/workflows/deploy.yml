@@ -66,11 +66,12 @@ jobs:
                 git reset --hard origin/master
               fi
 
+              dir
+
               # write env fresh (no interactive editor)
               printf "PORT=%s\n" "$PORT" > .env
 
               # list all files to verify .env is created and .git is not deleted
-              ls -la
               dir
 
               npm ci || npm install
