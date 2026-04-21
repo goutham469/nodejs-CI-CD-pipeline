@@ -54,16 +54,18 @@ jobs:
               sudo apt-get install -y nodejs git
               sudo npm i -g pm2
 
+              cd /home/ubuntu
+
               dir
 
-              if [ -d "\$REPO/.git" ]; then
-                cd "\$REPO"
+              if [ -d "$REPO/.git" ]; then
+                cd "$REPO"
                 git fetch --all
                 git reset --hard origin/master
               else
-                rm -rf "\$REPO"
-                git clone "https://github.com/\$GH_USER/\$REPO.git" "\$REPO"
-                cd "\$REPO"
+                rm -rf "$REPO"
+                git clone "https://github.com/$GH_USER/$REPO.git" "$REPO"
+                cd "$REPO"
                 git fetch --all
                 git reset --hard origin/master
               fi
