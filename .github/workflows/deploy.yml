@@ -41,44 +41,37 @@ jobs:
           
       - name: Deploy on EC2
         env:
-          EC2_IP: ${{ steps.provision.outputs.ec2_public_ip }}
-          GH_USER: ${{ secrets.USER_NAME_GITHUB }}
-          REPO: ${{ secrets.REPO_NAME }}
-          PORT : ${{ secrets.PORT }}
+            EC2_IP: ${{ steps.provision.outputs.ec2_public_ip }}
+            GH_USER: ${{ secrets.USER_NAME_GITHUB }}
+            REPO: ${{ secrets.REPO_NAME }}
+            PORT: ${{ secrets.PORT }}
         run: |
-          ssh -o StrictHostKeyChecking=no -i ec2_key.pem ubuntu@$EC2_IP << EOF
-            set -e
+            ssh -o StrictHostKeyChecking=no -i ec2_key.pem ubuntu@"$EC2_IP" << EOF
+              set -e
 
-            sudo apt-get update -y
-            curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-            sudo apt-get install -y nodejs git
-            sudo npm i -g pm2
+              sudo apt-get update -y
+              curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+              sudo apt-get install -y nodejs git
+              sudo npm i -g pm2
 
-            if [ -d "$REPO/.git" ]; then
-              dir
-              cd "$REPO"
-              dir
-              git fetch --all
-              git reset --hard origin/master
-              dir
-              rm .env
-              nano .env
-              echo "PORT=$PORT" >> .env
-            else
-              rm -rf "$REPO"
-              git clone "https://github.com/$GH_USER/$REPO.git" "$REPO"
-              dir
-              cd "$REPO"
-              dir
-              git fetch --all
-              git reset --hard origin/master
-              dir
-              echo "PORT=$PORT" >> .env
-            fi
+              if [ -d "\$REPO/.git" ]; then
+                cd "\$REPO"
+                git fetch --all
+                git reset --hard origin/master
+              else
+                rm -rf "\$REPO"
+                git clone "https://github.com/\$GH_USER/\$REPO.git" "\$REPO"
+                cd "\$REPO"
+                git fetch --all
+                git reset --hard origin/master
+              fi
 
-            npm ci || npm install
-            pm2 delete "$REPO" || true
-            pm2 start index.js --name "$REPO" --update-env
-            pm2 save
-            pm2 startup systemd -u ubuntu --hp /home/ubuntu | tail -n 1 | sudo bash
-          EOF
+              # write env fresh (no interactive editor)
+              printf "PORT=%s\n" "$PORT" > .env
+
+              npm ci || npm install
+              pm2 delete "\$REPO" || true
+              pm2 start index.js --name "\$REPO" --update-env
+              pm2 save
+              pm2 startup systemd -u ubuntu --hp /home/ubuntu | tail -n 1 | sudo bash
+            EOF
