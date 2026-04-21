@@ -120,7 +120,7 @@ jobs:
                       proxy_cache_bypass $http_upgrade;
                   }
               }
-              NGINXCONFIG
+              `NGINXCONFIG'
 
               # create symbolic link for nginx configuration and restart nginx
               sudo ln -s /etc/nginx/sites-available/"$DOMAIN" /etc/nginx/sites-enabled/
