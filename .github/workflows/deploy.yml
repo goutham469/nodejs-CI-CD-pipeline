@@ -99,7 +99,14 @@ jobs:
               # install nginx and configure it as reverse proxy
               sudo apt-get install -y nginx
               sudo rm -f /etc/nginx/sites-enabled/default
-              sudo tee /etc/nginx/sites-available/$DOMAIN << 'NGINXCONFIG'
+
+              # remove existing nginx configuration for the domain if exists
+              if [ -f "/etc/nginx/sites-available/$DOMAIN" ]; then
+                sudo rm -f /etc/nginx/sites-available/"$DOMAIN"
+                sudo rm -f /etc/nginx/sites-enabled/"$DOMAIN"
+              fi
+
+              sudo nano /etc/nginx/sites-available/$DOMAIN <<NGINXCONFIG
               server {
                   listen 80;
                   server_name $DOMAIN;
@@ -114,6 +121,8 @@ jobs:
                   }
               }
               NGINXCONFIG
+
+              # create symbolic link for nginx configuration and restart nginx
               sudo ln -s /etc/nginx/sites-available/"$DOMAIN" /etc/nginx/sites-enabled/
               sudo nginx -t
               sudo systemctl restart nginx
