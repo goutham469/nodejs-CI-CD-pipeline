@@ -4,7 +4,7 @@ const CORS = require("cors")
 const app = express()
 app.use(CORS())
 
-app.get("/", (req,res) => res.send("Hello man !"));
+app.get("/", (req,res) => res.send("Hello man, i am from space !"));
 
 const {PORT} = process.env;
 app.listen(4000, ()=> console.log("running on PORT ", PORT))
