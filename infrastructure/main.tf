@@ -53,6 +53,14 @@ resource "aws_security_group" "this" {
   }
 
   ingress {
+    description = "https server"
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = [ "0.0.0.0/0" ]
+  }
+
+  ingress {
     description = "node.js server CI/CD pipeline"
     from_port = 4000
     to_port = 4000
