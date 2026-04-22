@@ -114,4 +114,20 @@ jobs:
               sudo ln -s /etc/nginx/sites-available/"$DOMAIN" /etc/nginx/sites-enabled/
               sudo nginx -t
               sudo systemctl restart nginx
+
+              # install certbot for nginx
+              sudo apt-get update -y
+              sudo apt-get install -y certbot python3-certbot-nginx
+
+              # get + install certificate (non-interactive)
+              # put a real email here (or store as secret CERTBOT_EMAIL)
+              sudo certbot --nginx \
+                -d "$DOMAIN" \
+                --non-interactive --agree-tos \
+                -m "$EMAIL_FOR_CERTBOT" \
+                --redirect
+
+              # verify auto-renewal is scheduled
+              sudo systemctl status certbot.timer --no-pager || true
+              sudo certbot renew --dry-run
             EOF
