@@ -121,7 +121,7 @@ jobs:
                   }
               }
               " "$DOMAIN" "$PORT")
-              EOF
+            EOF
 
               # create symbolic link for nginx configuration and restart nginx
               sudo ln -s /etc/nginx/sites-available/"$DOMAIN" /etc/nginx/sites-enabled/
