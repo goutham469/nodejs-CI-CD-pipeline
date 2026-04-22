@@ -61,6 +61,7 @@ jobs:
             REPO: ${{ secrets.REPO_NAME }}
             PORT: ${{ secrets.PORT }}
             DOMAIN: ${{ secrets.DOMAIN }}
+            EMAIL_FOR_CERTBOT: ${{ secrets.EMAIL_FOR_CERTBOT }}
         run: |
             ssh -o StrictHostKeyChecking=no -i ec2_key.pem ubuntu@"$EC2_IP" << EOF
               set -e
